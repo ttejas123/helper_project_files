@@ -64,9 +64,9 @@ async function getContainers({accessToken, account_id}) {
     }
 }
 
- async function getPropertyIds({headers, accountName}):Promise<any> {
+ async function getPropertyIds({accessToken, accountName}){
       try {
-          const access_token = await this.getAccessTokenFromRefreshToken({ headers })
+          const access_token = accessToken
           const url = `https://content-analyticsadmin.googleapis.com/v1beta/properties?filter=parent:${accountName}`
           const header = this.getHeaders({ accessToken: access_token });
           const response = await axios.get(url, {...header});
@@ -76,9 +76,9 @@ async function getContainers({accessToken, account_id}) {
       }
   }
 
-  async function getAccounts({headers}):Promise<any> {
+  async function getAccounts({accessToken}){
     try {
-        const access_token = await this.getAccessTokenFromRefreshToken({ headers })
+        const access_token = accessToken
         const url = "https://content-analyticsadmin.googleapis.com/v1beta/accounts"
         const header = getHeaders({ accessToken: access_token });
         const response = await axios.get(url, {...header});
@@ -88,8 +88,8 @@ async function getContainers({accessToken, account_id}) {
     }
   }
 
-  async function createCustomDimension({propertyId, headers, customDimensionsArray=[]}):Promise<any> {
-    const access_token = await this.getAccessTokenFromRefreshToken({ headers })
+  async function createCustomDimension({propertyId, accessToken, customDimensionsArray=[]}) {
+    const access_token = accessToken
     const api_callheaders = getHeaders({ accessToken: access_token })
     const url = `https://analyticsadmin.googleapis.com/v1beta/properties/${propertyId}/customDimensions`;
     const customDimensions = customDimensionsArray.map(row => ({
