@@ -64,6 +64,60 @@ async function getContainers({accessToken, account_id}) {
     }
 }
 
+ async function getPropertyIds({headers, accountName}):Promise<any> {
+      try {
+          const access_token = await this.getAccessTokenFromRefreshToken({ headers })
+          const url = `https://content-analyticsadmin.googleapis.com/v1beta/properties?filter=parent:${accountName}`
+          const header = this.getHeaders({ accessToken: access_token });
+          const response = await axios.get(url, {...header});
+          return response.data
+      } catch (err) {
+          return null;
+      }
+  }
+
+  async function getAccounts({headers}):Promise<any> {
+    try {
+        const access_token = await this.getAccessTokenFromRefreshToken({ headers })
+        const url = "https://content-analyticsadmin.googleapis.com/v1beta/accounts"
+        const header = getHeaders({ accessToken: access_token });
+        const response = await axios.get(url, {...header});
+        return response.data?.accounts
+    } catch (err) {
+        return null;
+    }
+  }
+
+  async function createCustomDimension({propertyId, headers, customDimensionsArray=[]}):Promise<any> {
+    const access_token = await this.getAccessTokenFromRefreshToken({ headers })
+    const api_callheaders = getHeaders({ accessToken: access_token })
+    const url = `https://analyticsadmin.googleapis.com/v1beta/properties/${propertyId}/customDimensions`;
+    const customDimensions = customDimensionsArray.map(row => ({
+        displayName: row.displayName || '',
+        parameterName: row.parameterName || '',
+        scope: row.scope || '',
+        description: row.description || '',
+    }));
+    const res = []
+    for (const item of customDimensions) {
+        const data = {
+            description: item.description,
+            displayName: item.displayName,
+            scope: item.scope,
+            parameterName: item.parameterName,
+        };
+
+        try {
+            const response = await axios.post(url, data, api_callheaders);
+            res.push(response.data)
+        } catch (error) {
+            res.push(error)
+        }
+    }
+
+    return res;
+  }
+
 module.exports = {
     oAuth2Client,
     getHeaders,
